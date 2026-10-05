@@ -95,10 +95,6 @@ void * mymalloc (size_t size, char *file, int line){
     return NULL;
 }
 
-void coallese(void* ptr){
-
-}
-
 void myfree (void *ptr, char *file, int line){
     //printf("entered function\n");
     //Error check: free before shit is initialized
@@ -106,6 +102,7 @@ void myfree (void *ptr, char *file, int line){
         fprintf(stderr, "Free: Inappropriate pointer (%s:%d)\n", file, line);
         exit(2);
     }
+    
     struct header* curr = (struct header *) heap.bytes;
 
     //printf("heap.bytes      = %p\n", (void *)heap.bytes); //Mem addy for start of heap
@@ -189,10 +186,10 @@ int main (int argc, char **argv){
     //int *p = mymalloc(sizeof(int)*2, __FILE__, __LINE__); //error check
     //myfree(p + 1, __FILE__, __LINE__);
 
-    /*int *r = mymalloc(sizeof(int)*100, __FILE__, __LINE__); //error check
-    int *q = r;
-    myfree(r, __FILE__, __LINE__);
-    myfree(q, __FILE__, __LINE__);*/
+    //*int *r = mymalloc(sizeof(int)*100, __FILE__, __LINE__); //error check
+    //int *q = r;
+    //myfree(r, __FILE__, __LINE__);
+    //myfree(q, __FILE__, __LINE__);
 
     printHeaders();
 }
