@@ -31,6 +31,22 @@ void printHeaders(){
     printf("\n\n");
 }
 
+void detectLeaks(){
+    int leakedObjs = 0;
+    int leakedBytes = 0;
+    struct header* a = (struct header *) heap.bytes;
+    while(1){
+        if(a->status == 1){
+            leakedObjs+=1;
+            leakedBytes+=a->length;
+        }
+
+        if((void *)a + a->length+sizeof(struct header) >= (void*)(heap.bytes)+MEMLENGTH){ break; } //Quit ts before we get outside of array
+        a = (struct header *) ((char * )a + a->length+sizeof(struct header)); //iterates the penis
+    }
+    printf("%d bytes leaked in %d objects.\n", leakedBytes, leakedObjs);
+}
+
 void * mymalloc (size_t size, char *file, int line){
     int allocSize=size;
     int headersize= sizeof(struct header);
@@ -47,6 +63,7 @@ void * mymalloc (size_t size, char *file, int line){
         intial->status=0;
         intial->length=MEMLENGTH-headersize;
         initialized=1;
+        atexit(detectLeaks);
     }
     
     struct header *EndofList= (struct header *)((char *)intial + MEMLENGTH);
@@ -155,8 +172,8 @@ int main (int argc, char **argv){
     void* y = mymalloc(44,__FILE__,__LINE__);
     void* z = mymalloc(5,__FILE__,__LINE__);
 
-    myfree(z, __FILE__, __LINE__);
-    myfree(y, __FILE__, __LINE__);
+    //myfree(z, __FILE__, __LINE__);
+    //myfree(y, __FILE__, __LINE__);
 
 
 
