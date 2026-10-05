@@ -101,6 +101,11 @@ void coallese(void* ptr){
 
 void myfree (void *ptr, char *file, int line){
     //printf("entered function\n");
+    //Error check: free before shit is initialized
+    if(initialized==0){
+        fprintf(stderr, "Free: Inappropriate pointer (%s:%d)\n", file, line);
+        exit(2);
+    }
     struct header* curr = (struct header *) heap.bytes;
 
     //printf("heap.bytes      = %p\n", (void *)heap.bytes); //Mem addy for start of heap
