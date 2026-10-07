@@ -1,7 +1,9 @@
-#include "mymalloc.h"
 #include <stdio.h>
 #include <string.h>
 
+#ifndef REALMALLOC
+#include "mymalloc.h"
+#endif
 
 int main() {
     

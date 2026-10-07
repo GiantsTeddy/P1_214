@@ -1,11 +1,7 @@
 #include <stdlib.h>
-#include "malloc.h"
+#include <stdio.h>
+#include "mymalloc.h"
 
-#ifndef debug
-    #define debug 0
-#endif
-
-#define DEBUGPRINT(...) if(debug) printf(__VA_ARGS__);
 
 #define MEMLENGTH 4096
 static union {
@@ -44,7 +40,8 @@ void detectLeaks(){
         if((void *)a + a->length+sizeof(struct header) >= (void*)(heap.bytes)+MEMLENGTH){ break; } //Quit ts before we get outside of array
         a = (struct header *) ((char * )a + a->length+sizeof(struct header)); //iterates the penis
     }
-    printf("%d bytes leaked in %d objects.\n", leakedBytes, leakedObjs);
+    if(leakedBytes!=0)
+        fprintf(stderr, "mymalloc: %d bytes leaked in %d objects.\n", leakedBytes, leakedObjs);
     //printHeaders();
 }
 
@@ -58,7 +55,6 @@ void * mymalloc (size_t size, char *file, int line){
         allocSize=(size + 7) & ~7;
     }
     
-    DEBUGPRINT("%u\n",allocSize);
     struct header *intial = (struct header *) heap.bytes;//points to start of heap
     if(initialized==0){
         intial->status=0;
@@ -70,7 +66,6 @@ void * mymalloc (size_t size, char *file, int line){
     struct header *EndofList= (struct header *)((char *)intial + MEMLENGTH);
     int interations=1;
     for(struct header *p = (struct header *) heap.bytes;p<EndofList;p= (struct header *) ((char * )p+ p->length+headersize)){
-        DEBUGPRINT("%u\n",interations);
         interations++;
         
         if(p->status==0){
@@ -80,11 +75,10 @@ void * mymalloc (size_t size, char *file, int line){
                 
 
                 struct header *next=(struct header *) ((char * )p+ allocSize+headersize);
-                if(next>EndofList){
-                    DEBUGPRINT("next is end\n");
+                if(next>=EndofList){
                     p->length=allocSize;
                 }else if (oldLength-allocSize<=headersize+8){
-                    DEBUGPRINT("can't split\n");
+                    //Couldn't split
                 }else{
                     p->length=allocSize;
                     next->status=0;
@@ -94,9 +88,8 @@ void * mymalloc (size_t size, char *file, int line){
             }
         }
     }
-    DEBUGPRINT("it was full\n")
-    fprintf(stderr, "malloc: Unable to allocate %d bytes (%s:%d)\n", allocSize, file, line);
-    exit(2);
+    fprintf(stderr, "malloc: Unable to allocate %ld bytes (%s:%d)\n", size, file, line);
+    //exit(2);
     return NULL;
 }
 
@@ -105,12 +98,12 @@ void myfree (void *ptr, char *file, int line){
     //Error check: free before shit is initialized
     if(initialized==0){
         
-        fprintf(stderr, "Free: Inappropriate pointer (%s:%d)\n", file, line);
+        fprintf(stderr, "free: Inappropriate pointer (%s:%d)\n", file, line);
         exit(2);
     }
     
     struct header* curr = (struct header *) heap.bytes;
-
+    struct header *EndofList= (struct header *)((char *)curr + MEMLENGTH);
     //printf("heap.bytes      = %p\n", (void *)heap.bytes); //Mem addy for start of heap
     //printf("header pointer  = %p\n", (void *)curr + sizeof(struct header)); //Mem addy for header
     //printf("&heap           = %p\n", (void *)&heap); //Mem addy for start of heap
@@ -128,7 +121,7 @@ void myfree (void *ptr, char *file, int line){
     if((void *)curr + sizeof(struct header) == ptr){
         //Error check
         if(curr->status == 0){
-            fprintf(stderr, "Free: Inappropriate pointer (%s:%d)\n", file, line);
+            fprintf(stderr, "free: Inappropriate pointer (%s:%d)\n", file, line);
             exit(2);
         }
         //Deallocate bitches
@@ -139,8 +132,7 @@ void myfree (void *ptr, char *file, int line){
         while(1){
             if(a->status == 0){
                 struct header* b = (void*)a + a->length + sizeof(struct header); //b is the header next to a
-                
-                while(1){
+                while(b<EndofList){// edited incase b is outside of heap
                     if(b->status == 0){
                         a->length += b->length + sizeof(struct header);
                     } else { break; }
@@ -153,7 +145,7 @@ void myfree (void *ptr, char *file, int line){
         }
     } else {
         //Free: Inappropriate pointer (file.c:line)
-        fprintf(stderr, "Free: Inappropriate pointer (%s:%d)\n", file, line);
+        fprintf(stderr, "free: Inappropriate pointer (%s:%d)\n", file, line);
         exit(2);
         //printf("fucked it up\n");
     }

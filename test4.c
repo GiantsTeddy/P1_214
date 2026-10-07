@@ -1,3 +1,10 @@
+#include <stdio.h>
+#include <string.h>
+
+#ifndef REALMALLOC
+#include "mymalloc.h"
+#endif
+
 int main() {
     char *p = malloc(32);
     char *original = p;

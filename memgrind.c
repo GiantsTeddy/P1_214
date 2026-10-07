@@ -171,12 +171,13 @@ void workload5(){
 
 
 int main(int agrc, char** argv){
-    long avgMicro=0;
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
     for(int i = 0; i < 50; i++){
-        struct timeval start, end;
+        
 
         // Record the start time
-        gettimeofday(&start, NULL);
+        
 
         workload1();
         workload2();
@@ -185,16 +186,17 @@ int main(int agrc, char** argv){
         workload5();
 
         // Record the end time
-        gettimeofday(&end, NULL);
+        
 
         // Calculate total seconds and microseconds
-        long seconds = end.tv_sec - start.tv_sec;
-        long microseconds = end.tv_usec - start.tv_usec;
         
-        printf("Run %d: %ld sec %ld microsec \n", i, seconds, microseconds);
-        avgMicro+=(seconds*1000000)+microseconds;
+        
+        //printf("Run %d: %ld sec %ld microsec \n", i, seconds, microseconds);
     }
-    avgMicro= avgMicro/50.0;
+    gettimeofday(&end, NULL);
+    long seconds = end.tv_sec - start.tv_sec;
+    long microseconds = end.tv_usec - start.tv_usec;
+    long avgMicro =((seconds*1000000)+microseconds)/50.0;
     long avgSecs = avgMicro / 1000000;
     avgMicro = avgMicro % 1000000;
     printf("Average time over 50 runs: %ld seconds %ld micro seconds\n",avgSecs,avgMicro);
