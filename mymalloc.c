@@ -190,7 +190,7 @@ void myfree (void *ptr, char *file, int line){
     //int *p = mymalloc(sizeof(int)*2, __FILE__, __LINE__); //error check
     //myfree(p + 1, __FILE__, __LINE__);
 
-    //*int *r = mymalloc(sizeof(int)*100, __FILE__, __LINE__); //error check
+    ///int *r = mymalloc(sizeof(int)*100, __FILE__, __LINE__); //error check
     //int *q = r;
     //myfree(r, __FILE__, __LINE__);
     //myfree(q, __FILE__, __LINE__);

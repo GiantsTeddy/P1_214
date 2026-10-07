@@ -1,7 +1,8 @@
-#include "mymalloc.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
+#include "mymalloc.h"
 
 void workload1() {
     int sizes[] = {8, 16, 32, 64, 128, 512, 1024};
@@ -83,6 +84,24 @@ void workload3() {
     }
 }
 
+void workload4(){
+    void *ptrs[8];
+    //int allocated = 0;   // number of currently allocated objects
+    //int total_allocs = 0;
+    // Initialize array
+    for (int i = 0; i < 8; i++){
+        ptrs[i] = malloc(128);
+    }
+    for( int i=1;i<8;i+=2)
+        free(ptrs[i]);// every odd block is freed
+
+    free(ptrs[4]);
+    ptrs[4]=malloc(129);
+    for (int i = 0; i < 8; i+=2) {
+        free(ptrs[i]);
+    }
+}
+
 
 int main(int agrc, char** argv){
     for(int i = 0; i < 50; i++){
@@ -94,6 +113,7 @@ int main(int agrc, char** argv){
         workload1();
         workload2();
         workload3();
+        workload4();
 
         // Record the end time
         gettimeofday(&end, NULL);
