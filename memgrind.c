@@ -83,9 +83,6 @@ void workload3() {
     }
 }
 
-void workload4(){
-    //300 random allocations
-}
 
 int main(int agrc, char** argv){
     for(int i = 0; i < 50; i++){

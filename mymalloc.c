@@ -45,6 +45,7 @@ void detectLeaks(){
         a = (struct header *) ((char * )a + a->length+sizeof(struct header)); //iterates the penis
     }
     printf("%d bytes leaked in %d objects.\n", leakedBytes, leakedObjs);
+    //printHeaders();
 }
 
 void * mymalloc (size_t size, char *file, int line){
@@ -92,6 +93,8 @@ void * mymalloc (size_t size, char *file, int line){
         }
     }
     DEBUGPRINT("it was full\n")
+    fprintf(stderr, "malloc: Unable to allocate %d bytes (%s:%d)\n", allocSize, file, line);
+    exit(2);
     return NULL;
 }
 
@@ -99,6 +102,7 @@ void myfree (void *ptr, char *file, int line){
     //printf("entered function\n");
     //Error check: free before shit is initialized
     if(initialized==0){
+        
         fprintf(stderr, "Free: Inappropriate pointer (%s:%d)\n", file, line);
         exit(2);
     }
@@ -155,7 +159,7 @@ void myfree (void *ptr, char *file, int line){
 }
 
 
-int main (int argc, char **argv){
+/*int main (int argc, char **argv){
     void* fuck = mymalloc(16,__FILE__,__LINE__);
     void* a = mymalloc(300,__FILE__,__LINE__);
     int fill = 4096-(16+300)-30;
@@ -192,4 +196,4 @@ int main (int argc, char **argv){
     //myfree(q, __FILE__, __LINE__);
 
     printHeaders();
-}
+}*/
