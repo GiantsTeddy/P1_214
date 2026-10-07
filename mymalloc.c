@@ -77,14 +77,16 @@ void * mymalloc (size_t size, char *file, int line){
             if(p->length>=allocSize){
                 p->status=1;
                 int oldLength=p->length;
-                p->length=allocSize;
+                
 
-                struct header *next=(struct header *) ((char * )p+ p->length+headersize);
+                struct header *next=(struct header *) ((char * )p+ allocSize+headersize);
                 if(next>EndofList){
                     DEBUGPRINT("next is end\n");
+                    p->length=allocSize;
                 }else if (oldLength-allocSize<=headersize+8){
                     DEBUGPRINT("can't split\n");
                 }else{
+                    p->length=allocSize;
                     next->status=0;
                     next->length=oldLength-allocSize-headersize;
                 }
